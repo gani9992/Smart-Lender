@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+
+        <div class="text-center mb-5 animated-fade">
+            <span class="badge-accent mb-3 d-inline-block">System Architecture</span>
+            <h2 class="fw-bold" style="letter-spacing: -0.5px;">About SMART LENDER</h2>
+        </div>
+
+        <div class="row g-5">
+            <div class="col-lg-7">
+                <p style="color: var(--text-secondary); font-size: 1rem; line-height: 1.8; margin-bottom: 20px;">
+                    SMART LENDER is an intelligent ML underwriting tool that determines borrower eligibility and computes credit risk scores using eight optimized classifiers. The modular pipeline guarantees reproducible predictions with zero data leakage.
+                </p>
+
+                <div class="d-flex align-items-center gap-2 mb-3 pb-3" style="border-bottom: 1px solid var(--border-subtle);">
+                    <span style="color: var(--accent);"><i class="fa-solid fa-diagram-project"></i></span>
+                    <h4 class="fw-bold mb-0" style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.8px;">Training Pipeline</h4>
+                </div>
+
+                <ol style="color: var(--text-secondary); font-size: 0.88rem; line-height: 2.2; padding-left: 20px;">
+                    <li><strong style="color: var(--text-primary);">Missing Value Imputation</strong> — Numerical columns imputed with training median; categorical with mode.</li>
+                    <li><strong style="color: var(--text-primary);">Outlier Management</strong> — Log transform log(x+1) applied to skewed income and loan amount features.</li>
+                    <li><strong style="color: var(--text-primary);">Feature Encoding</strong> — Binary categoricals label-encoded; multi-class variables one-hot encoded.</li>
+                    <li><strong style="color: var(--text-primary);">Standard Scaling</strong> — Features normalized before passing to classifiers.</li>
+                    <li><strong style="color: var(--text-primary);">Cross-Validation</strong> — 8 models compared across accuracy, precision, recall, and F1. Best selected automatically.</li>
+                </ol>
+
+                <div class="mt-4">
+                    <div class="d-flex align-items-center gap-2 mb-3 pb-3" style="border-bottom: 1px solid var(--border-subtle);">
+                        <span style="color: var(--accent);"><i class="fa-solid fa-network-wired"></i></span>
+                        <h4 class="fw-bold mb-0" style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.8px;">System Flowchart</h4>
+                    </div>
+                    <div style="background: var(--bg-elevated); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 20px;">
+                        <pre style="margin: 0; font-size: 0.78rem; overflow-x: auto;">+-------------------+      +-------------------------+      +--------------------------+
+|  User Input Form  | ---> |  Data Preprocessing     | ---> |  Saved Scale Imputers    |
+| (Web or Batch CSV)|      |  (Missing Val / Logs)   |      |  (scaler.pkl / enc.pkl)  |
++-------------------+      +-------------------------+      +--------------------------+
+                                                                         |
+                                                                         v
++-------------------+      +-------------------------+      +--------------------------+
+| Underwriting PDF  | <--- |  Predict Outcome        | <--- |  Best Trained ML Model   |
+| & HTML Outcomes   |      |  (Decision & Reasoning) |      |  (best_model.pkl)        |
++-------------------+      +-------------------------+      +--------------------------+
+          |
+          v
++--------------------------+
+| SQLite DB History Logs   |
+| (PredictionHistory Table)|
++--------------------------+</pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="fintech-card p-4">
+                    <div class="d-flex align-items-center gap-2 mb-4 pb-3" style="border-bottom: 1px solid var(--border-subtle);">
+                        <span style="color: var(--accent);"><i class="fa-solid fa-database"></i></span>
+                        <h5 class="fw-bold mb-0" style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.8px;">Dataset Feature Space</h5>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-sm mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Feature</th>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody style="font-size: 0.8rem;">
+                                {% set features = [
+                                    ('Gender', 'Categorical', 'Male / Female'),
+                                    ('Married', 'Categorical', 'Yes / No'),
+                                    ('Dependents', 'Ordinal', '0, 1, 2, 3+'),
+                                    ('Education', 'Categorical', 'Graduate / Not Graduate'),
+                                    ('Self Employed', 'Categorical', 'Yes / No'),
+                                    ('ApplicantIncome', 'Numerical', 'Monthly income ($)'),
+                                    ('CoapplicantIncome', 'Numerical', 'Co-applicant income ($)'),
+                                    ('LoanAmount', 'Numerical', 'Requested amount ($ K)'),
+                                    ('Loan_Amount_Term', 'Numerical', 'Term in months'),
+                                    ('Credit_History', 'Binary', 'Meets guidelines (1/0)'),
+                                    ('Property_Area', 'Categorical', 'Rural / Semiurban / Urban')
+                                ] %}
+                                {% for name, ftype, desc in features %}
+                                <tr>
+                                    <td style="font-weight: 600; color: var(--accent);">{{ name }}</td>
+                                    <td style="color: var(--text-muted);">{{ ftype }}</td>
+                                    <td style="color: var(--text-secondary);">{{ desc }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+{% endblock %}

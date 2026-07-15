@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5 animated-fade">
+            <span class="badge-accent mb-3 d-inline-block">Assessment Portal</span>
+            <h2 class="fw-bold" style="letter-spacing: -0.5px;">Loan Pre-Approval Assessment</h2>
+            <p style="color: var(--text-secondary); max-width: 520px; margin: 0 auto;">Submit applicant details for instant ML-powered eligibility scoring, or upload a CSV for batch processing.</p>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-xl-9">
+
+                <!-- Tabs -->
+                <ul class="nav nav-tabs-custom justify-content-center" id="predictionTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="single-tab" data-bs-toggle="tab" data-bs-target="#single-predict" type="button" role="tab">
+                            <i class="fas fa-user-edit me-2"></i>Single Applicant
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="batch-tab" data-bs-toggle="tab" data-bs-target="#batch-predict" type="button" role="tab">
+                            <i class="fas fa-file-csv me-2"></i>Batch CSV Upload
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="predictionTabsContent">
+
+                    <!-- Single Predict -->
+                    <div class="tab-pane fade show active" id="single-predict" role="tabpanel">
+                        <div class="fintech-card p-4 p-md-5 animated-fade">
+                            <form id="predict-single-form" action="{{ url_for('predict') }}" method="POST" novalidate>
+
+                                <div class="d-flex align-items-center gap-2 mb-4 pb-3" style="border-bottom: 1px solid var(--border-subtle);">
+                                    <span style="color: var(--accent);"><i class="fas fa-id-card"></i></span>
+                                    <h5 class="fw-bold mb-0" style="font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.8px;">1 — Applicant Demographics</h5>
+                                </div>
+
+                                <div class="row g-3 mb-4">
+                                    <div class="col-md-6">
+                                        <label class="form-label-custom">Applicant Full Name</label>
+                                        <input type="text" class="form-control form-control-custom" name="applicant_name" placeholder="John Doe" required>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label-custom">Gender</label>
+                                        <select class="form-select form-control-custom" name="gender" required>
+                                            <option value="" disabled selected>Select</option>
+                                            <option value="Male">Male</option>
+                                            <option value="Female">Female</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label-custom">Marital Status</label>
+                                        <select class="form-select form-control-custom" name="married" required>
+                                            <option value="" disabled selected>Select</option>
+                                            <option value="Yes">Married</option>
+                                            <option value="No">Unmarried</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="row g-3 mb-5">
+                                    <div class="col-md-4">
+                                        <label class="form-label-custom">Dependents</label>
+                                        <select class="form-select form-control-custom" name="dependents" required>
+                                            <option value="" disabled selected>Select count</option>
+                                            <option value="0">0 Dependents</option>
+                                            <option value="1">1 Dependent</option>
+                                            <option value="2">2 Dependents</option>
+                                            <option value="3+">3+ Dependents</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label-custom">Education</label>
+                                        <select class="form-select form-control-custom" name="education" required>
+                                            <option value="" disabled selected>Select level</option>
+                                            <option value="Graduate">Graduate</option>
+                                            <option value="Not Graduate">Not Graduate</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label-custom">Employment</label>
+                                        <select class="form-select form-control-custom" name="self_employed" required>
+                                            <option value="" disabled selected>Select status</option>
+                                            <option value="No">Salaried Employee</option>
+                                            <option value="Yes">Self Employed</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex align-items-center gap-2 mb-4 pb-3" style="border-bottom: 1px solid var(--border-subtle);">
+                                    <span style="color: var(--accent);"><i class="fas fa-coins"></i></span>
+                                    <h5 class="fw-bold mb-0" style="font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.8px;">2 — Financial Profile</h5>
+                                </div>
+
+                                <div class="row g-3 mb-4">
+                                    <div class="col-md-6">
+                                        <label class="form-label-custom">Applicant Monthly Income ($)</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-dollar-sign" style="font-size:0.8rem;"></i></span>
+                                            <input type="number" step="any" class="form-control form-control-custom" id="applicant_income" name="applicant_income" placeholder="e.g. 5400" required style="border-radius: 0 var(--radius) var(--radius) 0;">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label-custom">Co-Applicant Monthly Income ($)</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-dollar-sign" style="font-size:0.8rem;"></i></span>
+                                            <input type="number" step="any" class="form-control form-control-custom" id="coapplicant_income" name="coapplicant_income" placeholder="0 if none" required style="border-radius: 0 var(--radius) var(--radius) 0;">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row g-3 mb-5">
+                                    <div class="col-md-4">
+                                        <label class="form-label-custom">Loan Amount ($ Thousands)</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-hand-holding-dollar" style="font-size:0.8rem;"></i></span>
+                                            <input type="number" step="any" class="form-control form-control-custom" id="loan_amount" name="loan_amount" placeholder="e.g. 140" required style="border-radius: 0 var(--radius) var(--radius) 0;">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label-custom">Loan Term (Months)</label>
+                                        <select class="form-select form-control-custom" id="loan_amount_term" name="loan_amount_term" required>
+                                            <option value="360" selected>360 — 30 Years</option>
+                                            <option value="240">240 — 20 Years</option>
+                                            <option value="180">180 — 15 Years</option>
+                                            <option value="120">120 — 10 Years</option>
+                                            <option value="84">84 — 7 Years</option>
+                                            <option value="60">60 — 5 Years</option>
+                                            <option value="36">36 — 3 Years</option>
+                                            <option value="12">12 — 1 Year</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label-custom">Credit History</label>
+                                        <select class="form-select form-control-custom" name="credit_history" required>
+                                            <option value="1.0" selected>1.0 — Meets Standards</option>
+                                            <option value="0.0">0.0 — Delinquency History</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="row g-3 mb-5">
+                                    <div class="col-md-6">
+                                        <label class="form-label-custom">Property Area</label>
+                                        <select class="form-select form-control-custom" name="property_area" required>
+                                            <option value="" disabled selected>Select location</option>
+                                            <option value="Urban">Urban — City Center</option>
+                                            <option value="Semiurban">Semiurban — Suburban</option>
+                                            <option value="Rural">Rural — Country Area</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn-primary-custom w-100 py-3" style="font-size: 1rem; border-radius: var(--radius);">
+                                    <i class="fa-solid fa-bolt me-2"></i>Run Automated Risk Assessment
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Batch Upload -->
+                    <div class="tab-pane fade" id="batch-predict" role="tabpanel">
+                        <div class="fintech-card p-4 p-md-5">
+                            <form id="predict-csv-form" action="{{ url_for('predict_csv') }}" method="POST" enctype="multipart/form-data">
+
+                                <div class="text-center mb-5">
+                                    <div style="font-size: 2.5rem; color: var(--accent); margin-bottom: 12px;"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+                                    <h4 class="fw-bold mb-2">Batch CSV Upload</h4>
+                                    <p style="color: var(--text-secondary); font-size: 0.88rem;">Process multiple applicants simultaneously. Results auto-saved to the admin dashboard.</p>
+                                </div>
+
+                                <div style="background: var(--bg-elevated); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 24px;">
+                                    <h6 class="fw-bold mb-2" style="font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.8px; color: var(--accent);">
+                                        <i class="fa-solid fa-circle-info me-2"></i>Required CSV Columns
+                                    </h6>
+                                    <p style="color: var(--text-secondary); font-size: 0.82rem; margin-bottom: 10px;">An optional <code>Applicant_Name</code> column may also be included.</p>
+                                    <code style="display: block; padding: 12px; background: var(--bg-base); border-radius: var(--radius); font-size: 0.78rem; overflow-x: auto; white-space: nowrap; color: var(--accent);">
+                                        Gender,Married,Dependents,Education,Self_Employed,ApplicantIncome,CoapplicantIncome,LoanAmount,Loan_Amount_Term,Credit_History,Property_Area
+                                    </code>
+                                    <p style="color: var(--text-muted); font-size: 0.78rem; margin-top: 10px; margin-bottom: 0;">
+                                        Sample row: <code>Male,Yes,1,Graduate,No,4583,1508,128,360,1.0,Rural</code>
+                                    </p>
+                                </div>
+
+                                <div class="mb-5">
+                                    <label class="form-label-custom">Select CSV File</label>
+                                    <input class="form-control form-control-custom" type="file" id="csv_file" name="csv_file" accept=".csv" required>
+                                </div>
+
+                                <button type="submit" class="btn-primary-custom w-100 py-3" style="font-size: 1rem; border-radius: var(--radius);">
+                                    <i class="fa-solid fa-upload me-2"></i>Upload & Process Batch
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

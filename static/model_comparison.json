@@ -1,0 +1,77 @@
+{
+    "comparison": [
+        {
+            "Model": "Logistic Regression",
+            "Accuracy": 0.96,
+            "Precision": 0.949685534591195,
+            "Recall": 1.0,
+            "F1-Score": 0.9741935483870968,
+            "CV Accuracy": 0.9279999999999999,
+            "ROC-AUC": 0.9754020813623463
+        },
+        {
+            "Model": "Decision Tree",
+            "Accuracy": 0.93,
+            "Precision": 0.9536423841059603,
+            "Recall": 0.9536423841059603,
+            "F1-Score": 0.9536423841059603,
+            "CV Accuracy": 0.922,
+            "ROC-AUC": 0.93519394512772
+        },
+        {
+            "Model": "Random Forest",
+            "Accuracy": 0.96,
+            "Precision": 0.949685534591195,
+            "Recall": 1.0,
+            "F1-Score": 0.9741935483870968,
+            "CV Accuracy": 0.925,
+            "ROC-AUC": 0.955939991890796
+        },
+        {
+            "Model": "KNN",
+            "Accuracy": 0.825,
+            "Precision": 0.8222222222222222,
+            "Recall": 0.9801324503311258,
+            "F1-Score": 0.8942598187311178,
+            "CV Accuracy": 0.8320000000000001,
+            "ROC-AUC": 0.8636302203000406
+        },
+        {
+            "Model": "Naive Bayes",
+            "Accuracy": 0.96,
+            "Precision": 0.949685534591195,
+            "Recall": 1.0,
+            "F1-Score": 0.9741935483870968,
+            "CV Accuracy": 0.9259999999999999,
+            "ROC-AUC": 0.968914718205163
+        },
+        {
+            "Model": "Support Vector Machine",
+            "Accuracy": 0.945,
+            "Precision": 0.9320987654320988,
+            "Recall": 1.0,
+            "F1-Score": 0.9648562300319489,
+            "CV Accuracy": 0.925,
+            "ROC-AUC": 0.9593188268684958
+        },
+        {
+            "Model": "Gradient Boosting",
+            "Accuracy": 0.95,
+            "Precision": 0.9548387096774194,
+            "Recall": 0.9801324503311258,
+            "F1-Score": 0.9673202614379085,
+            "CV Accuracy": 0.9199999999999999,
+            "ROC-AUC": 0.9576969860792
+        },
+        {
+            "Model": "XGBoost",
+            "Accuracy": 0.955,
+            "Precision": 0.9493670886075949,
+            "Recall": 0.9933774834437086,
+            "F1-Score": 0.970873786407767,
+            "CV Accuracy": 0.925,
+            "ROC-AUC": 0.9597242870658197
+        }
+    ],
+    "best_model": "Logistic Regression"
+}

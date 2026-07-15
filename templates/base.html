@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Smart Lender — Loan Eligibility Engine{% endblock %}</title>
+
+    <meta name="description" content="Automated machine learning loan eligibility verification system.">
+    <meta name="keywords" content="Machine Learning, Flask, Loan Eligibility, Risk Analysis">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<!-- Loading Overlay -->
+<div id="loading-overlay">
+    <div class="bank-spinner"></div>
+    <h5 id="loading-text" class="fw-bold mb-1">Processing assessment...</h5>
+    <p style="color: var(--text-secondary); font-size: 0.85rem;">Do not refresh the page</p>
+</div>
+
+<!-- Toast Container -->
+<div id="toast-container-custom" class="toast-container-custom"></div>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-custom">
+    <div class="container">
+        <a class="navbar-brand" href="{{ url_for('home') }}">
+            <span class="brand-icon"><i class="fa-solid fa-bolt"></i></span>
+            SMART<span style="color: var(--accent);">LENDER</span>
+        </a>
+
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="mainNavbar">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center gap-1">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/' or request.path == '/home' %}active{% endif %}" href="{{ url_for('home') }}">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/about' %}active{% endif %}" href="{{ url_for('about') }}">About</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/predict' %}active{% endif %}" href="{{ url_for('predict') }}">Verify Eligibility</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/dashboard' %}active{% endif %}" href="{{ url_for('dashboard') }}">Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/faq' %}active{% endif %}" href="{{ url_for('faq') }}">FAQ</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/contact' %}active{% endif %}" href="{{ url_for('contact') }}">Contact</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/admin' %}active{% endif %}" href="{{ url_for('admin') }}"><i class="fas fa-lock me-1" style="font-size:0.75rem;"></i>Admin</a>
+                </li>
+                <li class="nav-item ms-2">
+                    <button id="theme-toggle" class="theme-switch-btn" aria-label="Toggle theme">
+                        <i id="theme-icon" class="fas fa-sun"></i>
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Main Content -->
+<main>{% block content %}{% endblock %}</main>
+
+<!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row g-4 mb-4">
+            <div class="col-lg-4 col-md-6">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <span style="color: var(--accent); font-size: 1.1rem;"><i class="fa-solid fa-bolt"></i></span>
+                    <span class="fw-800" style="color: var(--text-primary); font-weight: 800; font-size: 1.1rem;">SMARTLENDER</span>
+                </div>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7;">Intelligent underwriting support powered by machine learning. Instant pre-approval decisions with explainable AI reasoning.</p>
+                <div class="d-flex gap-3 mt-3" style="font-size: 1rem;">
+                    <a href="#"><i class="fab fa-github"></i></a>
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+
+            <div class="col-lg-2 col-md-6 col-6">
+                <h6 class="fw-bold mb-3" style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">Tools</h6>
+                <ul class="list-unstyled d-flex flex-column gap-2" style="font-size: 0.85rem;">
+                    <li><a href="{{ url_for('predict') }}">Verify Eligibility</a></li>
+                    <li><a href="{{ url_for('dashboard') }}">Model Performance</a></li>
+                    <li><a href="{{ url_for('admin') }}">Admin Panel</a></li>
+                </ul>
+            </div>
+
+            <div class="col-lg-2 col-md-6 col-6">
+                <h6 class="fw-bold mb-3" style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">Support</h6>
+                <ul class="list-unstyled d-flex flex-column gap-2" style="font-size: 0.85rem;">
+                    <li><a href="{{ url_for('faq') }}">FAQ</a></li>
+                    <li><a href="{{ url_for('about') }}">About Project</a></li>
+                    <li><a href="{{ url_for('contact') }}">Report Issue</a></li>
+                </ul>
+            </div>
+
+            <div class="col-lg-4 col-md-6">
+                <h6 class="fw-bold mb-3" style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">IBM SkillsBuild Capstone</h6>
+                <p style="font-size: 0.85rem; color: var(--text-secondary);">Meets automated decision guidelines, security input checks, and explainable AI standards.</p>
+                <span class="badge-accent">Production-Ready Architecture</span>
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="row align-items-center">
+            <div class="col-md-6 text-center text-md-start">
+                <p class="mb-0" style="font-size: 0.8rem; color: var(--text-muted);">&copy; 2026 SmartLender Project. MIT License.</p>
+            </div>
+            <div class="col-md-6 text-center text-md-end mt-2 mt-md-0">
+                <p class="mb-0" style="font-size: 0.8rem; color: var(--text-muted);">Active Model: <span style="color: var(--accent); font-weight: 700;">{{ best_model_name }}</span></p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    showToast("{{ message }}", "{{ 'danger' if category == 'error' or category == 'danger' else 'success' if category == 'success' else 'warning' if category == 'warning' else 'info' }}");
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    });
+</script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

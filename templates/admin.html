@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+
+        <div class="text-center mb-5 animated-fade">
+            <span class="badge-accent mb-3 d-inline-block">Operations</span>
+            <h2 class="fw-bold" style="letter-spacing: -0.5px;"><i class="fa-solid fa-user-shield me-2" style="color: var(--accent);"></i>Admin Panel</h2>
+            <p style="color: var(--text-secondary); max-width: 520px; margin: 0 auto;">Manage prediction logs, database history, and customer contact messages.</p>
+        </div>
+
+        <ul class="nav nav-tabs-custom justify-content-center" id="adminTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="history-tab" data-bs-toggle="tab" data-bs-target="#admin-history" type="button">
+                    <i class="fas fa-list-check me-2"></i>Prediction History
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="inquiries-tab" data-bs-toggle="tab" data-bs-target="#admin-inquiries" type="button">
+                    <i class="fas fa-envelope-open-text me-2"></i>Customer Inquiries
+                    {% if inquiries|length > 0 %}
+                    <span style="background: var(--danger); color: #fff; font-size: 0.7rem; font-weight: 700; padding: 2px 7px; border-radius: 10px; margin-left: 6px;">{{ inquiries|length }}</span>
+                    {% endif %}
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content mt-4" id="adminTabsContent">
+
+            <!-- History Tab -->
+            <div class="tab-pane fade show active" id="admin-history" role="tabpanel">
+                <div class="fintech-card p-4">
+                    <div class="d-flex flex-wrap gap-3 justify-content-between align-items-center mb-4 pb-3" style="border-bottom: 1px solid var(--border-subtle);">
+                        <h5 class="fw-bold mb-0" style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.8px;">Assessment Database Logs</h5>
+                        <form action="{{ url_for('admin') }}" method="GET" class="d-flex gap-2">
+                            <input type="text" name="search" class="form-control form-control-custom" placeholder="Search name / result / risk..." value="{{ search }}" style="min-width: 240px;">
+                            <button type="submit" class="btn-primary-custom px-4" style="border-radius: var(--radius); white-space: nowrap;"><i class="fas fa-search"></i></button>
+                            {% if search %}
+                            <a href="{{ url_for('admin') }}" class="btn-secondary-custom px-3" style="display:inline-flex; align-items:center; text-decoration:none; border-radius: var(--radius);"><i class="fas fa-xmark"></i></a>
+                            {% endif %}
+                        </form>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-4">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Applicant</th>
+                                    <th>Date</th>
+                                    <th>Loan Amount</th>
+                                    <th>Outcome</th>
+                                    <th>Confidence</th>
+                                    <th>Risk</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if records %}
+                                    {% for row in records %}
+                                    <tr>
+                                        <td style="color: var(--text-muted); font-size: 0.8rem;">#{{ row.id }}</td>
+                                        <td style="font-weight: 600;">{{ row.applicant_name }}</td>
+                                        <td style="color: var(--text-secondary); font-size: 0.82rem;">{{ row.timestamp.strftime("%Y-%m-%d %H:%M") }}</td>
+                                        <td>${{ "{:,.0f}".format(row.loan_amount * 1000) }}</td>
+                                        <td>
+                                            {% if row.prediction_outcome == 'Y' %}
+                                            <span style="background: var(--accent-glow); border: 1px solid var(--border-accent); color: var(--accent); font-size: 0.75rem; font-weight: 700; padding: 3px 10px; border-radius: var(--radius); text-transform: uppercase; letter-spacing: 0.5px;">
+                                                <i class="fas fa-circle-check me-1"></i>Approved
+                                            </span>
+                                            {% else %}
+                                            <span style="background: var(--danger-glow); border: 1px solid rgba(255,71,87,0.3); color: var(--danger); font-size: 0.75rem; font-weight: 700; padding: 3px 10px; border-radius: var(--radius); text-transform: uppercase; letter-spacing: 0.5px;">
+                                                <i class="fas fa-triangle-exclamation me-1"></i>Declined
+                                            </span>
+                                            {% endif %}
+                                        </td>
+                                        <td style="font-weight: 600; color: var(--text-primary);">{{ "%.1f"|format(row.probability * 100) }}%</td>
+                                        <td>
+                                            {% if row.risk_level == 'Low' %}
+                                            <span style="color: var(--accent); font-weight: 600; font-size: 0.82rem;"><i class="fas fa-shield-check me-1"></i>Low</span>
+                                            {% elif row.risk_level == 'Medium' %}
+                                            <span style="color: var(--warning); font-weight: 600; font-size: 0.82rem;"><i class="fas fa-exclamation-triangle me-1"></i>Medium</span>
+                                            {% else %}
+                                            <span style="color: var(--danger); font-weight: 700; font-size: 0.82rem;"><i class="fas fa-radiation me-1"></i>High</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="d-flex gap-2 justify-content-center">
+                                                <a href="{{ url_for('result', prediction_id=row.id) }}" style="background: var(--bg-elevated); border: 1px solid var(--border-subtle); color: #00d4ff; padding: 5px 10px; border-radius: var(--radius); font-size: 0.8rem; text-decoration: none; transition: border-color 0.2s;" title="View"><i class="fas fa-eye"></i></a>
+                                                <a href="{{ url_for('download_pdf', prediction_id=row.id) }}" style="background: var(--bg-elevated); border: 1px solid var(--border-subtle); color: var(--accent); padding: 5px 10px; border-radius: var(--radius); font-size: 0.8rem; text-decoration: none;" title="PDF"><i class="fas fa-file-pdf"></i></a>
+                                                <a href="{{ url_for('delete_record', record_id=row.id) }}" style="background: var(--bg-elevated); border: 1px solid var(--border-subtle); color: var(--danger); padding: 5px 10px; border-radius: var(--radius); font-size: 0.8rem; text-decoration: none;" onclick="return confirm('Delete record #{{ row.id }}?')" title="Delete"><i class="fas fa-trash-alt"></i></a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="8" class="text-center py-5" style="color: var(--text-muted);">
+                                            <i class="fas fa-database mb-2 d-block" style="font-size: 1.5rem;"></i>
+                                            No prediction records found.
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {% if pagination and pagination.pages > 1 %}
+                    <nav>
+                        <ul class="pagination justify-content-center mb-0">
+                            <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+                                <a class="page-link" href="{{ url_for('admin', page=pagination.prev_num, search=search) }}">Prev</a>
+                            </li>
+                            {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                                {% if page_num %}
+                                    <li class="page-item {% if page_num == pagination.page %}active{% endif %}">
+                                        <a class="page-link" href="{{ url_for('admin', page=page_num, search=search) }}">{{ page_num }}</a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item disabled"><span class="page-link">…</span></li>
+                                {% endif %}
+                            {% endfor %}
+                            <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+                                <a class="page-link" href="{{ url_for('admin', page=pagination.next_num, search=search) }}">Next</a>
+                            </li>
+                        </ul>
+                    </nav>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Inquiries Tab -->
+            <div class="tab-pane fade" id="admin-inquiries" role="tabpanel">
+                <div class="fintech-card p-4">
+                    <div class="d-flex align-items-center gap-2 mb-4 pb-3" style="border-bottom: 1px solid var(--border-subtle);">
+                        <span style="color: var(--accent);"><i class="fa-solid fa-inbox"></i></span>
+                        <h5 class="fw-bold mb-0" style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.8px;">Customer Messages</h5>
+                    </div>
+                    <div class="row g-4">
+                        {% if inquiries %}
+                            {% for msg in inquiries %}
+                            <div class="col-md-6">
+                                <div style="background: var(--bg-elevated); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 20px; height: 100%;">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h6 class="fw-bold mb-0" style="font-size: 0.9rem;">{{ msg.subject }}</h6>
+                                        <span style="color: var(--text-muted); font-size: 0.75rem;">{{ msg.timestamp.strftime("%Y-%m-%d %H:%M") }}</span>
+                                    </div>
+                                    <p style="color: var(--accent); font-size: 0.8rem; margin-bottom: 10px;">{{ msg.name }} — <span style="color: var(--text-secondary);">{{ msg.email }}</span></p>
+                                    <p style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.7; margin-bottom: 16px;">"{{ msg.message }}"</p>
+                                    <div class="text-end">
+                                        <a href="{{ url_for('delete_contact', inquiry_id=msg.id) }}" class="btn-secondary-custom" style="display:inline-flex; align-items:center; gap:6px; text-decoration:none; font-size: 0.8rem; padding: 7px 16px;" onclick="return confirm('Resolve inquiry #{{ msg.id }}?')">
+                                            <i class="fas fa-check-circle"></i> Resolve
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="col-12 text-center py-5" style="color: var(--text-muted);">
+                                <i class="fas fa-inbox mb-3 d-block" style="font-size: 2rem;"></i>
+                                No active inquiries pending.
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+{% endblock %}

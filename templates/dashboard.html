@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+
+        <div class="text-center mb-5 animated-fade">
+            <span class="badge-accent mb-3 d-inline-block">Analytics</span>
+            <h2 class="fw-bold" style="letter-spacing: -0.5px;">Model Performance Dashboard</h2>
+            <p style="color: var(--text-secondary); max-width: 520px; margin: 0 auto;">Classifier evaluations, correlation heatmaps, and credit demographic distributions.</p>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="row g-4 mb-5">
+            <div class="col-lg-4">
+                <div class="fintech-card p-4 text-center h-100 d-flex flex-column justify-content-center">
+                    <div style="font-size: 2rem; color: var(--accent); margin-bottom: 10px;"><i class="fa-solid fa-trophy"></i></div>
+                    <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px;">Champion Model</div>
+                    <h3 class="fw-bold mb-2" style="color: var(--text-primary); letter-spacing: -0.5px;">{{ best_model }}</h3>
+                    <p style="color: var(--accent); font-size: 0.8rem; margin: 0;"><i class="fa-solid fa-circle-check me-1"></i>Selected by F1 Score</p>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="fintech-card p-4 h-100">
+                    <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 16px;">
+                        <i class="fa-solid fa-chart-pie me-2" style="color: var(--accent);"></i>Database Statistics
+                    </div>
+                    <div class="row g-3 text-center">
+                        <div class="col-md-4 col-6">
+                            <div style="background: var(--bg-elevated); border: 1px solid var(--border-subtle); border-radius: var(--radius); padding: 16px;">
+                                <div class="dashboard-stat-label mb-1">Total Submissions</div>
+                                <div class="dashboard-stat-val">{{ total_p }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-6">
+                            <div style="background: var(--bg-elevated); border: 1px solid var(--border-subtle); border-radius: var(--radius); padding: 16px;">
+                                <div class="dashboard-stat-label mb-1">Pre-Approved</div>
+                                <div class="dashboard-stat-val" style="color: var(--accent);">{{ app_p }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-12">
+                            <div style="background: var(--bg-elevated); border: 1px solid var(--border-subtle); border-radius: var(--radius); padding: 16px;">
+                                <div class="dashboard-stat-label mb-1">Low Risk Ratio</div>
+                                <div class="dashboard-stat-val" style="color: #00d4ff;">
+                                    {% if total_p > 0 %}{{ "%.1f"|format(low_risk / total_p * 100) }}%{% else %}74.5%{% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Comparison Table -->
+        <div class="fintech-card p-4 mb-5">
+            <div class="d-flex align-items-center gap-2 mb-2 pb-3" style="border-bottom: 1px solid var(--border-subtle);">
+                <span style="color: var(--accent);"><i class="fa-solid fa-table-list"></i></span>
+                <h4 class="fw-bold mb-0" style="font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.8px;">Classifier Comparison Matrix</h4>
+            </div>
+            <p style="color: var(--text-secondary); font-size: 0.82rem; margin-bottom: 20px;">8 models evaluated on accuracy, precision, recall, F1, cross-validation, and AUC.</p>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Model</th>
+                            <th>Accuracy</th>
+                            <th>Precision</th>
+                            <th>Recall</th>
+                            <th>F1-Score</th>
+                            <th>CV Mean</th>
+                            <th>ROC-AUC</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in comparison %}
+                        <tr {% if item.Model == best_model %}style="background: rgba(0,255,136,0.05);"{% endif %}>
+                            <td style="font-weight: {% if item.Model == best_model %}700{% else %}400{% endif %}; color: {% if item.Model == best_model %}var(--accent){% else %}var(--text-primary){% endif %};">
+                                {% if item.Model == best_model %}<i class="fas fa-star me-2" style="color: var(--warning); font-size: 0.75rem;"></i>{% endif %}
+                                {{ item.Model }}
+                            </td>
+                            <td>{{ "%.4f"|format(item.Accuracy) }}</td>
+                            <td>{{ "%.4f"|format(item.Precision) }}</td>
+                            <td>{{ "%.4f"|format(item.Recall) }}</td>
+                            <td style="color: var(--accent); font-weight: 600;">{{ "%.4f"|format(item['F1-Score']) }}</td>
+                            <td>{{ "%.4f"|format(item['CV Accuracy']) }}</td>
+                            <td>{{ "%.4f"|format(item['ROC-AUC']) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- EDA Plots -->
+        <div class="d-flex align-items-center gap-2 mb-4">
+            <span style="color: var(--accent);"><i class="fa-solid fa-chart-column"></i></span>
+            <h4 class="fw-bold mb-0" style="font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.8px;">Exploratory Data Analysis</h4>
+        </div>
+
+        <ul class="nav nav-pills justify-content-center mb-4 gap-2" id="edaPlotsTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="risk-plots-tab" data-bs-toggle="pill" data-bs-target="#risk-plots" type="button">
+                    <i class="fas fa-shield-halved me-1"></i>Credit Risk
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="demo-plots-tab" data-bs-toggle="pill" data-bs-target="#demo-plots" type="button">
+                    <i class="fas fa-users me-1"></i>Demographics
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="model-plots-tab" data-bs-toggle="pill" data-bs-target="#model-plots" type="button">
+                    <i class="fas fa-network-wired me-1"></i>Model Evaluation
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="edaPlotsTabContent">
+            <div class="tab-pane fade show active" id="risk-plots" role="tabpanel">
+                <div class="row g-4">
+                    {% set risk_plots = [
+                        ('loan_status_pie.png', 'Loan Status Distribution'),
+                        ('credit_history_analysis.png', 'Approval Rate by Credit History'),
+                        ('applicant_income_dist.png', 'Applicant Income Distribution'),
+                        ('loan_amount_dist.png', 'Loan Amount Distribution')
+                    ] %}
+                    {% for img, title in risk_plots %}
+                    <div class="col-md-6">
+                        <div class="fintech-card p-3 h-100">
+                            <h6 class="fw-bold text-center mb-3" style="font-size: 0.82rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">{{ title }}</h6>
+                            <img src="{{ url_for('static', filename='images/eda/' + img) }}" class="eda-plot-img" alt="{{ title }}" onerror="this.src='https://placehold.co/600x400/111620/00ff88?text=Run+train_model.py'">
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="demo-plots" role="tabpanel">
+                <div class="row g-4">
+                    {% set demo_plots = [
+                        ('gender_analysis.png', 'Approval by Gender'),
+                        ('marital_status_analysis.png', 'Approval by Marital Status'),
+                        ('property_area_analysis.png', 'Approval by Property Area'),
+                        ('employment_analysis.png', 'Approval by Employment Type')
+                    ] %}
+                    {% for img, title in demo_plots %}
+                    <div class="col-md-6">
+                        <div class="fintech-card p-3 h-100">
+                            <h6 class="fw-bold text-center mb-3" style="font-size: 0.82rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">{{ title }}</h6>
+                            <img src="{{ url_for('static', filename='images/eda/' + img) }}" class="eda-plot-img" alt="{{ title }}" onerror="this.src='https://placehold.co/600x400/111620/00ff88?text=Run+train_model.py'">
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="model-plots" role="tabpanel">
+                <div class="row g-4">
+                    {% set model_plots = [
+                        ('roc_curves_comparison.png', 'ROC Curves — All 8 Classifiers'),
+                        ('correlation_heatmap.png', 'Feature Correlation Heatmap'),
+                        ('best_model_confusion_matrix.png', 'Confusion Matrix — Best Model'),
+                        ('feature_importance.png', 'Feature Importance Weights')
+                    ] %}
+                    {% for img, title in model_plots %}
+                    <div class="col-md-6">
+                        <div class="fintech-card p-3 h-100">
+                            <h6 class="fw-bold text-center mb-3" style="font-size: 0.82rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">{{ title }}</h6>
+                            <img src="{{ url_for('static', filename='images/eda/' + img) }}" class="eda-plot-img" alt="{{ title }}" onerror="this.src='https://placehold.co/600x400/111620/00ff88?text=Run+train_model.py'">
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+{% endblock %}

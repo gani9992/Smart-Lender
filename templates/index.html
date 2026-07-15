@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<!-- Hero -->
+<section class="hero-section">
+    <div class="container position-relative" style="z-index: 1;">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6 animated-fade">
+                <span class="badge-accent mb-4 d-inline-block">Next-Gen Credit Analytics</span>
+                <h1 class="hero-title">Automated Loan<br><span class="gradient-text">Eligibility Engine</span></h1>
+                <p style="color: var(--text-secondary); font-size: 1.05rem; margin-bottom: 32px; line-height: 1.8;">
+                    State-of-the-art ML algorithms analyze applicant risk profiles, predict eligibility decisions, and generate detailed underwriting reports in real time.
+                </p>
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="{{ url_for('predict') }}" class="btn-primary-custom" style="display:inline-flex; align-items:center; gap:8px; text-decoration:none;">
+                        <i class="fa-solid fa-bolt"></i> Verify Eligibility
+                    </a>
+                    <a href="{{ url_for('dashboard') }}" class="btn-secondary-custom" style="display:inline-flex; align-items:center; gap:8px; text-decoration:none;">
+                        <i class="fa-solid fa-chart-line"></i> View Metrics
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-6 animated-fade">
+                <div class="fintech-card p-4">
+                    <div class="d-flex align-items-center gap-3 mb-4 pb-3" style="border-bottom: 1px solid var(--border-subtle);">
+                        <div style="width:42px; height:42px; background: var(--accent-glow); border: 1px solid var(--border-accent); border-radius: 6px; display:flex; align-items:center; justify-content:center;">
+                            <i class="fa-solid fa-shield-halved" style="color: var(--accent);"></i>
+                        </div>
+                        <div>
+                            <div style="font-weight: 700; font-size: 0.95rem;">Safe & Compliant Assessment</div>
+                            <div style="font-size: 0.78rem; color: var(--text-secondary);">IBM Capstone Compliant Framework</div>
+                        </div>
+                        <span class="ms-auto" style="width:8px; height:8px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 8px var(--accent);"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span style="font-size: 0.82rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Model Accuracy</span>
+                            <span style="font-size: 0.82rem; font-weight: 700; color: var(--accent);">83.4%</span>
+                        </div>
+                        <div class="progress-meter-container">
+                            <div class="progress-meter-bar" style="width: 83.4%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span style="font-size: 0.82rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Credit Risk Coverage</span>
+                            <span style="font-size: 0.82rem; font-weight: 700; color: #00d4ff;">100%</span>
+                        </div>
+                        <div class="progress-meter-container">
+                            <div class="progress-meter-bar" style="width: 100%; background: linear-gradient(90deg, #00d4ff, #0099ff);"></div>
+                        </div>
+                    </div>
+
+                    <div style="background: var(--bg-elevated); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 14px;">
+                        <p style="font-size: 0.82rem; color: var(--text-secondary); margin: 0; line-height: 1.6;">
+                            <i class="fa-solid fa-terminal me-2" style="color: var(--accent);"></i>
+                            Input financial parameters to execute classification across <strong style="color: var(--text-primary);">8 ML algorithms</strong> simultaneously.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats -->
+<section class="py-5" style="background: var(--bg-surface); border-bottom: 1px solid var(--border-subtle);">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-3 col-6">
+                <div class="fintech-card stat-card">
+                    <div class="stat-number"><span class="counter-val" data-target="{{ total_predictions }}">0</span></div>
+                    <div class="dashboard-stat-label">Assessments Run</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="fintech-card stat-card">
+                    <div class="stat-number"><span class="counter-val" data-target="{{ approval_rate }}">0</span>%</div>
+                    <div class="dashboard-stat-label">Pre-Approval Rate</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="fintech-card stat-card">
+                    <div class="stat-number"><span class="counter-val" data-target="8">0</span></div>
+                    <div class="dashboard-stat-label">ML Models</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="fintech-card stat-card">
+                    <div class="stat-number">&lt;<span class="counter-val" data-target="0.5">0.0</span>s</div>
+                    <div class="dashboard-stat-label">Response Time</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works -->
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <span class="badge-accent mb-3 d-inline-block">Process</span>
+            <h2 class="fw-bold" style="letter-spacing: -0.5px;">How SmartLender Works</h2>
+            <p style="color: var(--text-secondary); max-width: 520px; margin: 0 auto;">Four secure steps from data entry to a formal underwriting decision.</p>
+        </div>
+
+        <div class="row g-4">
+            {% set steps = [
+                ('fa-keyboard', 'accent', '01', 'Data Entry', 'Fill in demographic and financial parameters including income, loan amount, and credit history.'),
+                ('fa-gears', '00d4ff', '02', 'ML Verification', 'Data is preprocessed, scaled, and passed through XGBoost, Random Forest, and SVC pipelines.'),
+                ('fa-gauge-high', 'accent', '03', 'Risk Scoring', 'Pre-approval probabilities are calculated with DTI analysis and default risk classification.'),
+                ('fa-file-pdf', '00d4ff', '04', 'Assessment Report', 'Download a formal PDF with confidence scores, risk flags, and actionable recommendations.')
+            ] %}
+            {% for icon, color, num, title, desc in steps %}
+            <div class="col-md-3">
+                <div class="fintech-card glass-card-hover h-100 p-4">
+                    <div style="font-size: 0.72rem; font-weight: 800; color: var(--text-muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 16px;">{{ num }}</div>
+                    <div style="font-size: 1.6rem; color: {% if color == 'accent' %}var(--accent){% else %}#{{ color }}{% endif %}; margin-bottom: 14px;">
+                        <i class="fa-solid {{ icon }}"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2" style="font-size: 1rem;">{{ title }}</h5>
+                    <p style="color: var(--text-secondary); font-size: 0.85rem; margin: 0; line-height: 1.7;">{{ desc }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Features -->
+<section class="py-5" style="background: var(--bg-surface); border-top: 1px solid var(--border-subtle);">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-5">
+                <span class="badge-accent mb-3 d-inline-block">Capabilities</span>
+                <h2 class="fw-bold mb-4" style="letter-spacing: -0.5px;">Enterprise-Grade Underwriting</h2>
+
+                {% set features = [
+                    ('fa-layer-group', 'Batch Processing', 'Upload CSV files with hundreds of profiles. Results auto-saved to the admin dashboard.'),
+                    ('fa-brain', 'Explainable AI', 'Every decision includes structured reasoning — DTI limits, credit impact, and property risk.'),
+                    ('fa-moon', 'Dark Fintech UI', 'Premium dark interface with sharp edges and electric green accents for professional use.')
+                ] %}
+                {% for icon, title, desc in features %}
+                <div class="d-flex align-items-start gap-3 mb-4">
+                    <div style="width:36px; height:36px; min-width:36px; background: var(--accent-glow); border: 1px solid var(--border-accent); border-radius: 6px; display:flex; align-items:center; justify-content:center;">
+                        <i class="fa-solid {{ icon }}" style="color: var(--accent); font-size: 0.85rem;"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-1" style="font-size: 0.95rem;">{{ title }}</h6>
+                        <p style="color: var(--text-secondary); font-size: 0.85rem; margin: 0; line-height: 1.7;">{{ desc }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="col-lg-7">
+                <div class="row g-3">
+                    {% set models = [
+                        ('fa-microchip', 'accent', 'XGBoost Classifier', 'Extreme gradient boosting for high-accuracy non-linear classification.'),
+                        ('fa-tree', '00d4ff', 'Random Forest', 'Ensemble of decision trees with strong generalization performance.'),
+                        ('fa-bezier-curve', 'accent', 'Support Vector Machine', 'Maximizes margins in high-dimensional credit risk space.'),
+                        ('fa-arrow-trend-up', '00d4ff', 'Logistic Regression', 'Statistical baseline with explainable weight distributions.')
+                    ] %}
+                    {% for icon, color, title, desc in models %}
+                    <div class="col-6">
+                        <div class="fintech-card p-4 h-100">
+                            <div style="font-size: 1.2rem; color: {% if color == 'accent' %}var(--accent){% else %}#{{ color }}{% endif %}; margin-bottom: 10px;">
+                                <i class="fa-solid {{ icon }}"></i>
+                            </div>
+                            <h6 class="fw-bold mb-1" style="font-size: 0.88rem;">{{ title }}</h6>
+                            <p style="color: var(--text-secondary); font-size: 0.8rem; margin: 0; line-height: 1.6;">{{ desc }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

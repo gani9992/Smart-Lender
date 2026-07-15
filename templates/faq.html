@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block content %}
+<section style="padding:60px 0;">
+    <div class="container">
+
+        <div class="text-center mb-5 animated-fade">
+            <p class="section-tag">Help</p>
+            <h2 class="section-title">Frequently Asked Questions</h2>
+            <p style="color:var(--text-muted);max-width:480px;margin:0 auto 28px;font-size:0.92rem;">Answers to common questions about credit parameters, ML scoring, and system usage.</p>
+            <div style="max-width:440px;margin:0 auto;position:relative;">
+                <i class="fas fa-search" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:0.85rem;pointer-events:none;"></i>
+                <input type="text" id="faqSearch" class="form-control-sl" placeholder="Search questions..." oninput="filterFAQ()" style="padding-left:38px;">
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                {% for q, a in [
+                    ('What is the average accuracy of the prediction model?', 'The system evaluates 8 ML algorithms — Random Forest, XGBoost, SVM, KNN, Naive Bayes, Gradient Boosting, Logistic Regression, and Decision Trees. The champion model typically achieves 81–96% accuracy depending on dataset quality.'),
+                    ('Why is Credit History the strongest indicator?', 'Applicants with positive payment history (Credit_History = 1.0) have approval rates exceeding 80%, while those without records show rejection rates above 90%. Tree-based models identify this as the highest information-gain split.'),
+                    ('How can I improve a declined outcome?', 'The system recommends actions dynamically. Common steps: apply for a lower loan amount, add a co-applicant to pool income, establish regular savings, and resolve negative credit records.'),
+                    ('Can I upload bulk customer profiles?', 'Yes — use the Batch CSV Upload tab in the Assess section. Upload files with demographic and financial records. Results are parsed and saved to the admin history panel automatically.'),
+                    ('Is this system compliant with banking security guidelines?', 'The app integrates input validation, uses SQLAlchemy ORM for sanitized queries, and restricts file upload types to prevent XSS and injection attacks.'),
+                    ('How is the best model selected?', 'After training all 8 classifiers on an 80/20 train-test split, the model with the highest F1-Score is automatically saved as best_model.pkl and used for all subsequent predictions.'),
+                    ('What does the PDF report contain?', 'The PDF includes applicant details, the pre-approval verdict, confidence score, risk classification, analysis reasoning, and actionable financial suggestions — formatted for formal underwriting review.'),
+                    ('Can I deploy this on a cloud platform?', 'Yes. The project includes a Procfile for Railway/Render and supports IBM Cloud via manifest.yml. Set the build command to install dependencies and run data_generator.py + train_model.py before starting with gunicorn.')
+                ] %}
+                <div class="acc-item faq-item" style="margin-bottom:8px;">
+                    <button class="acc-header" onclick="toggleAcc(this)">
+                        <span>{{ q }}</span>
+                        <i class="fas fa-chevron-down" style="font-size:0.8rem;transition:transform 0.3s;flex-shrink:0;margin-left:12px;"></i>
+                    </button>
+                    <div class="acc-body">{{ a }}</div>
+                </div>
+                {% endfor %}
+
+                <div id="faqEmpty" style="display:none;text-align:center;padding:48px;color:var(--text-muted);">
+                    <i class="fas fa-search" style="font-size:2rem;margin-bottom:12px;display:block;opacity:0.4;"></i>
+                    No matching questions found.
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<script>
+function toggleAcc(btn) {
+    const body = btn.nextElementSibling;
+    const icon = btn.querySelector('i');
+    const isOpen = body.classList.contains('open');
+    document.querySelectorAll('.acc-body.open').forEach(b => {
+        b.classList.remove('open');
+        b.previousElementSibling.classList.remove('open');
+        b.previousElementSibling.querySelector('i').style.transform = '';
+    });
+    if (!isOpen) {
+        body.classList.add('open');
+        btn.classList.add('open');
+        icon.style.transform = 'rotate(180deg)';
+    }
+}
+
+function filterFAQ() {
+    const q = document.getElementById('faqSearch').value.toLowerCase();
+    const items = document.querySelectorAll('.faq-item');
+    let visible = 0;
+    items.forEach(item => {
+        const match = item.textContent.toLowerCase().includes(q);
+        item.style.display = match ? '' : 'none';
+        if (match) visible++;
+    });
+    document.getElementById('faqEmpty').style.display = visible === 0 ? 'block' : 'none';
+}
+</script>
+{% endblock %}
